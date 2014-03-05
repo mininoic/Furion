@@ -1,4 +1,3 @@
-module.exports = function(app){
 	var QuestionsPack = function(){
 		this.questions = [{
 			question: 'Question 1?',
@@ -33,5 +32,4 @@ module.exports = function(app){
 			this.currentQuestion++;
 		}
 	}
-	app.createModule('QuestionsPack', QuestionsPack);	
 };

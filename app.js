@@ -15,13 +15,13 @@ db.on('error', function () {
 var modelsPath = __dirname + '/app/models';
 fs.readdirSync(modelsPath).forEach(function(file) {
 	if (file.length - file.indexOf('.js') === 3) {
-		require(modelsPath+'/'+file)(app);
+		require(modelsPath+'/'+file);
 	}
 });
 
 console.title('ANHNT MININOIC CONSOLE');
 var app = express();
-app.socketio = new socketio(app.listen(config.port));
+socketio.def(app.listen(config.port));
 
 console.title('STARTING SERVER');
 require('./config/express')(app, config);

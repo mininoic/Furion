@@ -1,7 +1,8 @@
 var uuid = require('node-uuid'),
 	Q = require('q'),
-	token = require('../../lib/token')
-	IO = require('../socketio')();
+	token = require('../../lib/token'),
+	root = require('find-root')(),
+	IO = require(root+'/config/socketio');
 
 var Rooms = { room: {} };
 var room = Rooms.room;

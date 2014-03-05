@@ -1,9 +1,11 @@
 var socketio = require('socket.io'),
-	token = require('./token'),
+	token = require('../app/lib/token'),
 	_ = require('underscore'),
 	Q = require('q');
 
-module.exports = function(httpServer){
+var IO = {};
+
+IO.def = function(httpServer){
 	var io = socketio.listen(httpServer);
 	io.set('log level', 1);
 	
@@ -107,3 +109,5 @@ module.exports = function(httpServer){
 		}
 	});
 };
+
+module.exports = IO;
