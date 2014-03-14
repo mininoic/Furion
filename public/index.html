@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>test</title>
+	<script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+	<script src="socket.io/socket.io.js"></script>
+</head>
+<body>
+<button id="p1">player 1</button>
+<button id="p1join">player 1 join</button>
+
+<button id="p2">player 2</button>
+<input type="text" value="" id="roomid"/>
+<button id="p2join">player 2 join</button>
+
+<div>
+	<label>Cau hoi: </label>
+	<select id="causo" name="causo">
+	  <option value="0">0</option>
+	  <option value="1">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>
+	</select>
+	
+	<label>Dap an: </label>
+	<select id="dapan" name="dapan">
+	  <option value="0">0</option>
+	  <option value="1">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>
+	</select>
+
+	<button id="traloi">Tra loi</button>
+</div>
+
+<script type="text/javascript">
+	$('#traloi').click(function(){
+		var causo = $('select[name=causo]').val();
+		var dapan = $('select[name=dapan]').val();
+
+		socket.emit('answer', {'answer' : dapan});
+	});
+
+
+
+
+	$('#p1').click(function(){
+			var token = sessionStorage.token;
+			if(token){
+				create_room(token);
+			}else{
+				$.ajax({
+				  url: "/token/signin",
+				  method: "GET",
+				  context: document.body
+				}).done(function() {
+				  console.log( "done" );
+				}).success(function(data, status){
+					sessionStorage.token = data.token;
+					connect_socket(sessionStorage.token);
+
+					create_room(sessionStorage.token);
+				});
+			}
+	});
+	$('#p2').click(function(){
+			var token = sessionStorage.token;
+			if(token){
+				connect_socket(token);
+			}else{
+				signin();
+			}
+		});
+
+		$('#p1join').click(function(){
+			socket.emit('join', {'roomId' : sessionStorage.roomId});
+		});
+
+
+		$('#p2join').click(function(){
+			var roomId = $('#roomid').val();
+			socket.emit('join', {'roomId' : roomId});
+		});
+
+		function connect_socket(token, roomId){
+			socket = io.connect('http://localhost:3000', {
+			  'query': 'token=' + token
+			});
+			//console.log(socket);
+			socket.on('startGame', function(data, abc){
+				console.log('start game',data);
+			});
+		}
+
+		function create_room(token){
+			connect_socket(token);
+			console.log(token);
+			$.ajax({
+			  url: "/api/create-new-direct-game",
+			  method: "GET",
+			  beforeSend: function (request)
+	            {
+	                request.setRequestHeader("Authorization", 'Bearer '+token);
+	            },
+			  context: document.body
+			}).done(function() {
+			  console.log( "done" );
+			}).success(function(data, status){
+				console.log(data);
+				sessionStorage.roomId = data;
+			});
+		}
+
+		function signin(){
+			$.ajax({
+			  url: "/token/signin",
+			  method: "GET",
+			  context: document.body
+			}).done(function() {
+			  console.log( "done" );
+			}).success(function(data, status){
+				sessionStorage.token = data.token;
+				connect_socket(sessionStorage.token);
+			});
+		}
+</script>
+</body>
+</html>
